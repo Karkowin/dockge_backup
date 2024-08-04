@@ -31,6 +31,9 @@ if [ ! -z "$1" ]; then
             else
                 exit 0
             fi
+        # If there are no backups then backup
+        elif [ ${#diffs[@]} -eq 0 ]; then
+            exit 1
         fi
     else
         echo "Backup path does not exist or is not a directory"
