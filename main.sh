@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "${BASH_SOURCE[0]}")"
 source ./settings.conf
 date=$(date +%Y-%m-%d)
 epoch=$(date -d "$date" +%s)
@@ -67,5 +68,13 @@ function backup_stacks {
   done
 }
 
+# Call backup functions
 backup_dockge
 backup_stacks
+# Execute all scripts in the custom folder
+for script in ./custom/*.sh
+do
+  if [ "$script" != "./custom/example.sh" ]; then
+    bash $script
+  fi
+done
