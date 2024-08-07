@@ -30,12 +30,13 @@ function backup_dockge {
   ./tools/interval.sh $BACKUP_PATH/dockge
   if [ $? -eq 1 ]; then
     log "Backing up dockge"
-    if ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "tar -czf - $DOCKGE_PATH" > $BACKUP_PATH/dockge/$date.tar.gz; then
+    OPERATION=$(ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "tar -czf - $DOCKGE_PATH" 2<&1 > $BACKUP_PATH/dockge/$date.tar.gz)
+    if [ $? -eq 0 ]; then
       log "Backup of dockge successful"
       bash ./tools/cleanup.sh $BACKUP_PATH/dockge
     else
-      log "Error backing up dockge: $?"
-      mail "Dockge" "$?"
+      log "Error backing up dockge: $OPERATION"
+      mail "Dockge" "$OPERATION"
       rm $BACKUP_PATH/dockge/$date.tar.gz
     fi
   fi
@@ -56,12 +57,13 @@ function backup_stacks {
     ./tools/interval.sh $BACKUP_PATH/stacks/$stack
     if [ $? -eq 1 ]; then
       log "Backing up $stack"
-      if ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "tar -czf - $STACKS_PATH/$stack" > $BACKUP_PATH/stacks/$stack/$date.tar.gz; then
+      OPERATION=$(ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "tar -czf - $STACKS_PATH/$stack" 2<&1 > $BACKUP_PATH/stacks/$stack/$date.tar.gz)
+      if [ $? -eq 0 ]; then
         log "Backup of $stack successful"
         bash ./tools/cleanup.sh $BACKUP_PATH/stacks/$stack
       else
-        log "Error backing up $stack: $?"
-        mail "$stack" "$?"
+        log "Error backing up $stack: $OPERATION"
+        mail "$stack" "$OPERATION"
         rm $BACKUP_PATH/stacks/$stack/$date.tar.gz
       fi
     fi
