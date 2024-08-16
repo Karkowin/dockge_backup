@@ -22,16 +22,17 @@ function startbackup {
 }
 
 function endbackup {
-  OPERATION=$(tar -czf $BACKUP_PATH/custom/$STACK_NAME/$date.tar.gz $TMP_DIRECTORY 2<&1)
-  if [ $? -eq 0 ]; then
-    log "Archive of $STACK_NAME successful"
-    rm -rf $TMP_DIRECTORY
-    bash ./tools/cleanup.sh $BACKUP_PATH/custom/$STACK_NAME
-  else
-    log "Error archiving $STACK_NAME: $OPERATION"
-    mail "Archive $STACK_NAME" "$OPERATION"
-    rm -rf /tmp/dockge_backup
+  if [ "$(ls -A "$TMP_DIRECTORY")" ]; then
+    OPERATION=$(tar -czf $BACKUP_PATH/custom/$STACK_NAME/$date.tar.gz $TMP_DIRECTORY 2<&1)
+    if [ $? -eq 0 ]; then
+      log "Archive of $STACK_NAME successful"
+      bash ./tools/cleanup.sh $BACKUP_PATH/custom/$STACK_NAME
+    else
+      log "Error archiving $STACK_NAME: $OPERATION"
+      mail "Archive $STACK_NAME" "$OPERATION"
+    fi
   fi
+  rm -rf $TMP_DIRECTORY
 }
 
 # Backup PostgreSQL
